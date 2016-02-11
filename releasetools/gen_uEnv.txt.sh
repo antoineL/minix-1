@@ -77,7 +77,7 @@ echo "# Set the command to be executed"
 echo "uenvcmd=run $BOOT"
 echo "bootargs=console=$CONSOLE rootdevname=c0d0p1 verbose=$VERBOSE hz=$HZ"
 echo
-echo 'bootminix=setenv bootargs \$bootargs board_name=\$board_name ; echo \$bootargs; go  0x80200000 \\\"$bootargs\\\"'
+echo 'bootminix=setenv bootargs \$bootargs board_name=\$board_name board_rev=\$board_rev ; echo \$bootargs; go  0x80200000 \\\"$bootargs\\\"'
 echo
 echo "mmcbootcmd=echo starting from MMC ; mmc part 0; $(fill_cmd "fatload mmc 0:1" "") ; run bootminix"
 echo
