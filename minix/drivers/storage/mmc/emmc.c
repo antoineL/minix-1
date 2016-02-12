@@ -657,9 +657,9 @@ emmc_host_init(struct mmc_host *host)
 {
 	struct machine machine;
 
-	/* The eMMC is present on the BBB only. */
+	/* The eMMC is present on the BBB and BBG only. */
 	sys_getmachine(&machine);
-	if (!BOARD_IS_BBB(machine.board_id))
+	if (!(BOARD_IS_BBB(machine.board_id) || BOARD_IS_BBG(machine.board_id)))
 		return -1;
 
 	/* Initialize the driver and kernel structures. */
