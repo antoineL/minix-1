@@ -355,6 +355,8 @@ void set_machine_id(char *cmdline)
 {
 
 	char boardname[20];
+	char boardrev[20];
+
 	memset(boardname,'\0',20);
 	if (find_value(cmdline,"board_name=",boardname,20)){
 		/* we expect the bootloader to pass a board_name as argument
@@ -363,7 +365,13 @@ void set_machine_id(char *cmdline)
 		 * and hope the bootloader will do something nice with it */
 		POORMANS_FAILURE_NOTIFICATION;
 	}  
-	machine.board_id = get_board_id_by_short_name(boardname);
+
+	memset(boardrev,'\0',20);
+	if (find_value(cmdline,"board_rev=",boardrev,20)){
+		POORMANS_FAILURE_NOTIFICATION;
+	}
+
+	machine.board_id = get_board_id_by_short_name(boardname,boardrev);
 
 	if (machine.board_id ==0){
 		/* same thing as above there is no safe escape */

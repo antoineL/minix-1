@@ -80,6 +80,8 @@
 #define MINIX_BOARD_VARIANT_BBW MINIX_MK_BOARD_VARIANT(1<<1)
 /* BeagleBone Black */
 #define MINIX_BOARD_VARIANT_BBB MINIX_MK_BOARD_VARIANT(1<<2)
+/* BeagleBone Green */
+#define MINIX_BOARD_VARIANT_BBG MINIX_MK_BOARD_VARIANT(1<<3)
 
 #define BOARD_ID_INTEL \
 	( MINIX_BOARD_ARCH_X86 \
@@ -113,13 +115,22 @@
 	| MINIX_BOARD_VARIANT_BBB\
 	)
 
+#define BOARD_ID_BBG \
+	( MINIX_BOARD_ARCH_ARM \
+	| MINIX_BOARD_ARCH_VARIANT_ARM_ARMV7 \
+	| MINIX_BOARD_VENDOR_TI \
+	| MINIX_BOARD_BB \
+	| MINIX_BOARD_VARIANT_BBG\
+	)
+
 #define BOARD_IS_BBXM(v) \
 		( (BOARD_ID_BBXM & ~MINIX_BOARD_VARIANT_MASK) == (v & ~MINIX_BOARD_VARIANT_MASK))
-/* Either one of the known BeagleBones */
+/* Any of the known BeagleBones */
 #define BOARD_IS_BB(v)   \
 		( (BOARD_ID_BBW & ~MINIX_BOARD_VARIANT_MASK) == (v & ~MINIX_BOARD_VARIANT_MASK))
 #define BOARD_IS_BBW(v)  ( v == BOARD_ID_BBW)
 #define BOARD_IS_BBB(v)  ( v == BOARD_ID_BBB)
+#define BOARD_IS_BBG(v)  ( v == BOARD_ID_BBG)
 
 #define BOARD_FILTER_BBXM_VALUE (BOARD_ID_BBXM)
 #define BOARD_FILTER_BBXM_MASK  \
@@ -139,15 +150,21 @@
 struct shortname2id
 {
 	const char name[15];
+	const char rev[15];
 	unsigned int id;
 };
 
 
 /* mapping from fields given by the bootloader to board id's */
 static struct shortname2id shortname2id[] = {
-	{.name = "BBXM",.id = BOARD_ID_BBXM},
-	{.name = "A335BONE",.id = BOARD_ID_BBW},
-	{.name = "A335BNLT",.id = BOARD_ID_BBB},
+	{.name = "BBXM",.rev = "",.id = BOARD_ID_BBXM},
+	{.name = "A335BONE",.rev = "",.id = BOARD_ID_BBW},
+	/* older versions of u-boot pass 0x1a 0x00 for BBG */
+	{.name = "A335BNLT",.rev = {0x1a, 0x00},.id = BOARD_ID_BBG},
+	/* newer versions of u-boot pass "BBG1" for BBG */
+	{.name = "A335BNLT",.rev = "BBG1",.id = BOARD_ID_BBG},
+	/* all other A335BNLT are BBB */
+	{.name = "A335BNLT",.rev = "",.id = BOARD_ID_BBB},
 };
 
 struct board_id2name
@@ -162,6 +179,7 @@ static struct board_id2name board_id2name[] = {
 	{.id = BOARD_ID_BBXM,.name = "ARM-ARMV7-TI-BBXM-GENERIC"},
 	{.id = BOARD_ID_BBW,.name = "ARM-ARMV7-TI-BB-WHITE"},
 	{.id = BOARD_ID_BBB,.name = "ARM-ARMV7-TI-BB-BLACK"},
+	{.id = BOARD_ID_BBG,.name = "ARM-ARMV7-TI-BB-GREEN"},
 };
 
 struct board_arch2arch
@@ -177,11 +195,13 @@ static struct board_arch2arch board_arch2arch[] = {
 
 /* returns 0 if no board was found that match that id */
 static int
-get_board_id_by_short_name(const char *name)
+get_board_id_by_short_name(const char *name, const char *rev)
 {
 	int x;
 	for (x = 0; x < sizeof(shortname2id) / sizeof(shortname2id[0]); x++) {
-		if (strncmp(name, shortname2id[x].name, 15) == 0) {
+		if ((strncmp(name, shortname2id[x].name, 15) == 0) &&
+		    (shortname2id[x].rev[0] == '\0' ||
+		     strncmp(rev, shortname2id[x].rev, 15) == 0)) {
 			return shortname2id[x].id;
 		}
 	}
