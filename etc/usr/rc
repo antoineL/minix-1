@@ -331,6 +331,31 @@ start|autoboot)
 
 			;;
 
+		ARM-ARMV7-TI-BB-GREEN)
+			echo "Running on a BeagleBone Green"
+			echo -n "Starting i2c device drivers: "
+
+			# start EEPROM driver for reading board info
+			test -e /dev/eepromb1s50 || \
+				(cd /dev && MAKEDEV eepromb1s50)
+			up cat24c256 -dev /dev/eepromb1s50 \
+				-label cat24c256.1.50 \
+				-args 'bus=1 address=0x50'
+
+			# Start TPS65217 driver for power management.
+			up tps65217 -label tps65217.1.24 \
+			        -args 'bus=1 address=0x24'
+
+			if [ -e /service/usbd ]
+			then
+				echo "Starting USBD"
+				up usbd
+			fi
+			# Detect expansion boards and start drivers.
+			capemgr
+
+			;;
+
 		ARM-ARMV7-TI-BBXM-GENERIC)
 			echo "Running on a BeagleBoard-xM"
 			echo -n "Starting i2c device drivers: "
