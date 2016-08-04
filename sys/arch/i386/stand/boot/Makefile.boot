@@ -152,7 +152,7 @@ vers.c: ${VERSIONFILE} ${SOURCES} ${LIBLIST} ${.CURDIR}/../Makefile.boot
 ${PROG}: ${OBJS} ${LIBLIST} ${LDSCRIPT} ${.CURDIR}/../Makefile.boot
 	${_MKTARGET_LINK}
 	bb="$$( ${CC} -o ${PROG}.sym ${LDFLAGS} -Wl,--section-start=.text=0 -Wl,-cref \
-	    ${OBJS} ${LIBLIST} | ( \
+	    ${OBJS} ${LIBLIST} | tee /dev/null | ( \
 		while read symbol file; do \
 			[ -z "$$file" ] && continue; \
 			[ "$$symbol" = real_to_prot ] && break; \
@@ -167,7 +167,7 @@ ${PROG}: ${OBJS} ${LIBLIST} ${LDSCRIPT} ${.CURDIR}/../Makefile.boot
 		do :; \
 		done; \
 	) )"; \
-	${CC} -o ${PROG}.syms ${LDFLAGS} -Wl,--section-start=.text=0 -T ${LDSCRIPT} \
+	${CC} -o ${PROG}.sym ${LDFLAGS} -Wl,--section-start=.text=0 -T ${LDSCRIPT} \
 		-Wl,-Map,${PROG}.map -Wl,-cref ${OBJS} $$bb ${LIBLIST}
 	${OBJCOPY} -O binary ${PROG}.sym ${PROG}
 
