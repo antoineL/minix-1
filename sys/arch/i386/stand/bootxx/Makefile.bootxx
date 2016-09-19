@@ -5,6 +5,10 @@ S=	${.CURDIR}/../../../../..
 AFLAGS.bootxx.S= ${${ACTIVE_CC} == "clang":?-no-integrated-as:}
 AFLAGS.label.S= ${${ACTIVE_CC} == "clang":?-no-integrated-as:}
 AFLAGS.pbr.S= ${${ACTIVE_CC} == "clang":?-no-integrated-as:}
+.if defined(__MINIX)
+# LSC: Required by pkgsrc's binutils for MINIX<=3.3.0
+AFLAGS.bootxx.S+= -Wa,--divide
+.endif # defined(__MINIX)
 
 PIE_CFLAGS=
 PIE_LDFLAGS=

@@ -16,6 +16,9 @@ PIE_AFLAGS=
 
 .if defined(__MINIX)
 USE_BITCODE=no
+
+# LSC: Required by pkgsrc's binutils for MINIX<=3.3.0
+AFLAGS+= -Wa,--divide
 .endif # defined(__MINIX)
 
 .include <bsd.own.mk>
